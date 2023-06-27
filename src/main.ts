@@ -12,7 +12,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const corsOptions: CorsOptions = {
-    origin: 'http://localhost:3333', // Replace with your frontend URL
+    origin: 'https://task-front-bee29.web.app', // Replace with your frontend URL
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Accept',
     preflightContinue: false,
