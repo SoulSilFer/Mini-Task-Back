@@ -1,7 +1,5 @@
-import { SecurityQuestionsEnum } from './questions.enum';
-
 export type UserSecurityQuestions = {
-  question: SecurityQuestionsEnum;
+  id: string;
   answer: string;
 };
 

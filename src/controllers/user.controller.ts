@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import * as yup from 'yup';
 
 import { UserEntity } from 'src/entities';
 import { UserService } from 'src/services';
-import { UserPostType } from 'src/types/user';
-import { AppError } from 'src/types';
+import { GetUserByEmailType, UserPostType } from 'src/types/user';
+import { AppError, PRE_ERRORS } from 'src/types';
+import { ResetPasswordPostType } from 'src/types/user/reset.password.type';
 
 @Controller('user')
 export class UserController {
@@ -27,11 +28,11 @@ export class UserController {
         .array()
         .of(
           yup.object().shape({
-            question: yup.string().required(),
+            id: yup.string().required(),
             answer: yup.string().required()
           })
         )
-        .min(1)
+        .min(3)
         .max(3)
     });
 
@@ -61,6 +62,52 @@ export class UserController {
     } catch (error) {
       if (error.message === 'emailAlreadyInUse') {
         throw new AppError('emailAlreadyInUse');
+      }
+
+      throw new AppError(error);
+    }
+  }
+
+  @Get(':email')
+  getByEmail(@Param('email') email: string): Promise<GetUserByEmailType> {
+    return this.userService.getByEmail(email);
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Body() resetPasswordBody: ResetPasswordPostType
+  ): Promise<any> {
+    const schema = yup.object().shape({
+      newPassword: yup.string().min(8).required(),
+      email: yup.string().email().required(),
+      securityQuestions: yup
+        .array()
+        .of(
+          yup.object().shape({
+            id: yup.string().required(),
+            answer: yup.string().required()
+          })
+        )
+        .min(1)
+        .max(3)
+    });
+
+    try {
+      schema.validateSync(resetPasswordBody);
+    } catch (error) {
+      throw new AppError(error.errors);
+    }
+
+    try {
+      await this.userService.resetPassword(resetPasswordBody);
+
+      return {
+        statusCode: 200,
+        message: 'Password updated successfully.'
+      };
+    } catch (error) {
+      if (error.message === PRE_ERRORS.invalidCredentials) {
+        throw new AppError(PRE_ERRORS.invalidCredentials);
       }
 
       throw new AppError(error);

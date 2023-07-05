@@ -1,64 +1,48 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import {
   AuthenticateController,
+  QuestionController,
   TaskController,
   UserController
 } from './controllers';
-import { AuthenticateService, TaskService, UserService } from './services';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { TaskEntity, UserEntity } from './entities';
-import { ConfigModule } from '@nestjs/config';
+import {
+  AuthenticateService,
+  QuestionService,
+  TaskService,
+  UserService
+} from './services';
+import { QuestionEntity, TaskEntity, UserEntity } from './entities';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV}`
+      isGlobal: true
     }),
+
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'babar.db.elephantsql.com',
-      port: 5432,
-      username: 'dbcipotg',
-      password: '5v3WdURm8Gi5T3r5JAPETy_-4QwCQehC',
-      database: 'dbcipotg',
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT as unknown as number,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true
     }),
-    TypeOrmModule.forFeature([UserEntity, TaskEntity])
+
+    TypeOrmModule.forFeature([UserEntity, TaskEntity, QuestionEntity])
   ],
-  controllers: [UserController, TaskController, AuthenticateController],
-  providers: [UserService, TaskService, AuthenticateService]
+
+  controllers: [
+    UserController,
+    TaskController,
+    AuthenticateController,
+    QuestionController
+  ],
+
+  providers: [UserService, TaskService, AuthenticateService, QuestionService]
 })
 export class AppModule {}
-// TypeOrmModule.forRoot({
-//   type: 'postgres',
-//   host: 'localhost',
-//   port: 5432,
-//   username: 'postgres',
-//   password: 'silfer',
-//   database: 'postgres',
-//   entities: ['dist/**/*.entity{.ts,.js}'],
-//   synchronize: true
-// }),
-// TypeOrmModule.forRoot({
-//   type: 'postgres',
-//   host: 'babar.db.elephantsql.com',
-//   port: 5432,
-//   username: 'dbcipotg',
-//   password: '5v3WdURm8Gi5T3r5JAPETy_-4QwCQehC',
-//   database: 'dbcipotg',
-//   entities: ['dist/**/*.entity{.ts,.js}'],
-//   synchronize: true
-// }),
-
-// {
-//   "type": "postgres",
-//   "host": "babar.db.elephantsql.com",
-//   "port": 5432,
-//   "username": "dbcipotg",
-//   "password": "5v3WdURm8Gi5T3r5JAPETy_-4QwCQehC",
-//   "database": "dbcipotg",
-//   "entities": ["dist/**/*.entity{.ts,.js}"],
-//   "synchronize": true
-// }

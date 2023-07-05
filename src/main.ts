@@ -12,7 +12,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const corsOptions: CorsOptions = {
-    origin: 'https://task-front-bee29.web.app', // Replace with your frontend URL
+    origin: process.env.F_E_URL,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Accept',
     preflightContinue: false,
@@ -20,7 +20,6 @@ async function bootstrap() {
   };
   app.enableCors(corsOptions);
 
-  // Apply global validation pipe
   app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(3000);
