@@ -1,0 +1,30 @@
+name: Railway Deployment
+
+on:
+  push:
+    branches:
+      - main  # Change this to the branch you want to trigger the deployment on
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install  # Modify this command if you're using a different package manager
+
+      - name: Railway login
+        run: npm install -g railway
+        env:
+          RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}  # Create the 'RAILWAY_API_KEY' secret in your repository settings
+
+      - name: Deploy to Railway
+        run: railway up
